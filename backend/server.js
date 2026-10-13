@@ -9,6 +9,25 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+
+// WEEK 4: log every request with method, URL, status code, and how long it took
+app.use((req, res, next) => {
+    const st = Date.now();
+  
+    res.on("finish", () => {
+      const dur = Date.now() - st;
+      console.log(
+        new Date().toISOString() + " " +
+        req.method + " " +
+        req.originalUrl + " " +
+        res.statusCode + " " +
+        dur + "ms"
+      );
+    });
+  
+    next();
+  });
+
 app.get("/api/health", async (req, res) => {
   try {
     await pool.query("SELECT 1");
