@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const pool = require("./db");
+const propertiesRouter = require("./routes/properties");
 
 const app = express();
 app.use(cors());
@@ -16,6 +17,8 @@ app.get("/api/health", async (req, res) => {
     res.status(500).json({ status: "error", database: "disconnected" });
   }
 });
+
+app.use("/api/properties", propertiesRouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, (err) => {
