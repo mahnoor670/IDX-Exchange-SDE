@@ -1,19 +1,18 @@
-// All requests to the Express backend go through this file.
-// The "proxy" in package.json forwards /api/* to localhost:5000.
+//WEEK 5 
 
+// Sends a get request to the backend and returns the JSON data.
+// If the backend responds with an error status (400, 404, 500, etc.),
+// it throws an Error with the backend's message so the page can show it.
 async function request(path) {
   const res = await fetch(path);
 
   // Any status outside 200-299 means something went wrong
   if (res.status < 200 || res.status >= 300) {
-    // Your backend sends errors like { error: "Failed to fetch properties" }.
-    // Try to read that message; fall back to a generic one.
     let message = "Request failed (" + res.status + ")";
     try {
       const body = await res.json();
       if (body.error) message = body.error;
     } catch {
-      // Response wasn't JSON, keep the generic message
     }
     throw new Error(message);
   }
@@ -21,8 +20,13 @@ async function request(path) {
   return res.json();
 }
 
+
+
+// Gets a page of properties from get /api/properties.
+// Takes an optional filters object like { city: "Irvine", beds: 3 },
+// removes any empty filters, and adds the rest to the URL.
+// Returns { total, limit, offset, results }.
 export function fetchProperties(params = {}) {
-  // Only keep filters that actually have a value
   const cleaned = {};
   for (const key in params) {
     const value = params[key];
@@ -38,6 +42,8 @@ export function fetchProperties(params = {}) {
   }
   return request("/api/properties");
 }
+
+
 
 
 export function fetchPropertyDetail(id) {

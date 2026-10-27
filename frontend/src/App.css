@@ -100,3 +100,33 @@
 .error-message {
   color: #b91c1c;
 }
+
+.property-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0 20px;
+}
+
+.property-filters input,
+.property-filters select {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.property-filters button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  background: #2b6cb0;
+  color: white;
+}
+
+.property-filters button[type="button"] {
+  background: #e2e8f0;
+  color: #333;
+}
