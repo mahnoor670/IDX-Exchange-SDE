@@ -1,21 +1,30 @@
 import { useState } from "react";
 import { getFirstPhoto } from "../utils/photos";
 
-// True if a value is actually there (not null, undefined, or empty)
+
+// WEEK 5
+// Makes one house card for the listings page.
+// Shows the photo, price, address, city, and beds/baths/sqft,
+// and skips anything that's missing so nothing breaks.
+
+
+// returns true if a value is actually there (not null, undefined, or empty)
 function hasValue(value) {
   return value !== null && value !== undefined && value !== "";
 }
 
-// Turns 1250000 into "$1,250,000". Null or 0 shows "Price N/A".
+
+// Makes the price look nice with a $ and commas., if there's no real price, shows "Price not listed" instead.
 function formatPrice(price) {
   const num = Number(price);
   if (!hasValue(price) || isNaN(num) || num <= 0) {
-    return "Price N/A";
+    return "Price not listed ";
   }
   return "$" + num.toLocaleString("en-US");
 }
 
-// Returns "1 bed" or "3 beds" depending on the number
+
+// Adds an "s" to the word if the number isn't 1 (so "1 bed" but "4 beds")
 function pluralize(count, word) {
   if (count === 1) {
     return count + " " + word;
@@ -23,11 +32,17 @@ function pluralize(count, word) {
   return count + " " + word + "s";
 }
 
+
+// One house card that shows the photo, price, address, city, and stats
 function PropertyCard({ property }) {
+
+// Remembers if the photo link failed to load
   const [photoBroken, setPhotoBroken] = useState(false);
+
+  //grabs first photo
   const photo = getFirstPhoto(property.L_Photos);
 
-  // Build "Irvine, CA" from whatever parts exist
+  // Builds the city and state line, skipping anything missing
   let location = "";
   if (hasValue(property.L_City)) {
     location = property.L_City;
@@ -39,7 +54,7 @@ function PropertyCard({ property }) {
     location = location + property.L_State;
   }
 
-  // Only show stats that exist, so we never print "null beds"
+  //Builds the beds, baths, and sqft line, never prints "null beds" or missing info
   const stats = [];
   if (hasValue(property.L_Keyword2)) {
     stats.push(pluralize(Number(property.L_Keyword2), "bed"));

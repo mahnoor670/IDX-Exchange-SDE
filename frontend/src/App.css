@@ -130,3 +130,42 @@
   background: #e2e8f0;
   color: #333;
 }
+
+/* Week 7 page buttons */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin: 32px 0;
+  flex-wrap: wrap;
+}
+
+.pagination-btn {
+  min-width: 38px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #f0f0f0;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-btn-active {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+.pagination-ellipsis {
+  padding: 0 4px;
+  color: #888;
+}

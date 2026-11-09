@@ -2,10 +2,15 @@ import { useEffect, useState } from "react";
 import { fetchProperties } from "../api/client";
 import PropertyCard from "../components/PropertyCard";
 import PropertyFilters from "../components/PropertyFilters";
+//WEEK 7!
+import Pagination from "../components/Pagination";
 
-// WEEK 5 + 6: Main listings page
+// WEEK 5 + 6 + 7: Main listings page
 // Shows the search bar, gets matching houses from the backend,
-// and shows each house as a card
+// shows each house as a card, and the page buttons at the bottom
+
+// WEEK 7: how many houses show on each page
+const ITEMS_PER_PAGE = 20;
 
 function ListingsPage() {
 
@@ -18,7 +23,11 @@ function ListingsPage() {
   // WEEK 6: what the user searched for. Empty means = show all houses
   const [filters, setFilters] = useState({});
 
-// Runs when the page first opens and every time the user searches
+  // WEEK 7: which page the user is on. Starts at page 1
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Runs when the page first opens, every time the user searches,
+  // and every time the user picks a different page
   useEffect(() => {
     // WEEK 6 flash bug fix: if the user searches again, this becomes true
     // so a slow old search can't show up and cover the new one
@@ -27,7 +36,12 @@ function ListingsPage() {
     setLoading(true);
     setError(null);
 
-    fetchProperties(filters)
+    // WEEK 7: figures out how many houses to skip to get to this page
+    // page 1 skips 0, page 2 skips 20, page 3 skips 40
+    const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+    // sends the search filters plus which page we want
+    fetchProperties({ ...filters, limit: ITEMS_PER_PAGE, offset: offset })
       .then((data) => {
         if (ignore) return;
         // Save the houses and the total so the page can show them
@@ -49,16 +63,27 @@ function ListingsPage() {
     return () => {
       ignore = true;
     };
-  }, [filters]);
+  }, [filters, currentPage]);
 
   // Called by the form when Search is clicked
+  // WEEK 7: also goes back to page 1, since it's a new search
   function handleSearch(newFilters) {
     setFilters({ ...newFilters });
+    setCurrentPage(1);
   }
 
   // Called by the form when Clear is clicked, goes back to showing everything
+  // WEEK 7: also goes back to page 1
   function handleClear() {
     setFilters({});
+    setCurrentPage(1);
+  }
+
+  // WEEK 7: Called by Pagination when a page button is clicked
+  // switches to that page and jumps back to the top of the screen
+  function handlePageChange(page) {
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
   }
 
   // Picks what to show under the form: loading, error, empty, or the grid
@@ -85,17 +110,32 @@ function ListingsPage() {
       );
     }
 
-    // if everything works, show the count and one card per house
+    // WEEK 7: numbers for the "Showing 21-40 of 487" text
+    // first = the number of the first house on this page
+    // last = the number of the last house on this page
+    const first = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+    const last = first + properties.length - 1;
+
+    // WEEK 7: how many pages there are in total
+    // Math.ceil rounds up, so 487 houses / 20 = 24.35, which becomes 25 pages
+    const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+
+    // if everything works, show the count, one card per house, and the page buttons
     return (
       <>
         <p className="results-count">
-          Showing {properties.length} of {total.toLocaleString("en-US")} properties
+          Showing {first}-{last} of {total.toLocaleString("en-US")} properties
         </p>
         <div className="listings-grid">
           {properties.map((p) => (
             <PropertyCard key={p.L_ListingID} property={p} />
           ))}
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </>
     );
   }
