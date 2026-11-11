@@ -1,11 +1,13 @@
-import { useState } from "react";
-import { getFirstPhoto } from "../utils/photos";
+import { useNavigate } from "react-router-dom";
+import PropertyImageCarousel from "./PropertyImageCarousel";
 
 
-// WEEK 5
+// WEEK 5 + 8
 // Makes one house card for the listings page.
 // Shows the photo, price, address, city, and beds/baths/sqft,
 // and skips anything that's missing so nothing breaks.
+// WEEK 8: clicking the card opens that house's own page,
+// and the photo part has arrows to flip through all the photos.
 
 
 // returns true if a value is actually there (not null, undefined, or empty)
@@ -33,14 +35,16 @@ function pluralize(count, word) {
 }
 
 
-// One house card that shows the photo, price, address, city, and stats
+// One house card that shows the photos, price, address, city, and stats
 function PropertyCard({ property }) {
 
-// Remembers if the photo link failed to load
-  const [photoBroken, setPhotoBroken] = useState(false);
+  // WEEK 8: lets this card send you to a different page
+  const navigate = useNavigate();
 
-  //grabs first photo
-  const photo = getFirstPhoto(property.L_Photos);
+  // WEEK 8: when the card is clicked, go to this house's page
+  function handleClick() {
+    navigate("/property/" + property.L_ListingID);
+  }
 
   // Builds the city and state line, skipping anything missing
   let location = "";
@@ -67,19 +71,9 @@ function PropertyCard({ property }) {
   }
 
   return (
-    <div className="property-card">
-      {photo && !photoBroken ? (
-        <img
-          className="property-card-photo"
-          src={photo}
-          alt={property.L_Address}
-          onError={() => setPhotoBroken(true)}
-        />
-      ) : (
-        <div className="property-card-photo property-card-no-photo">
-          No photo
-        </div>
-      )}
+    <div className="property-card" onClick={handleClick}>
+      {/* WEEK 8: photos with arrows */}
+      <PropertyImageCarousel photos={property.L_Photos} address={property.L_Address} />
 
       <div className="property-card-info">
         <p className="property-card-price">{formatPrice(property.L_SystemPrice)}</p>
